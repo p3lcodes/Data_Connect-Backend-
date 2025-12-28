@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Connect Backend</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(120deg, #f0f4f8 0%, #e0e7ef 100%);
+      min-height: 100vh;
+      color: #222;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px #0001;
+      padding: 2rem 2.5rem 2.5rem 2.5rem;
+    }
+    h1 {
+      color: #2563eb;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 2.5rem;
+      font-size: 1.1rem;
+    }
+    section { margin-bottom: 2.5rem; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 1rem;
+      background: #f8fafc;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px #0001;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 8px;
+      font-size: 1rem;
+    }
+    th {
+      background: #2563eb;
+      color: #fff;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    tr:nth-child(even) { background: #e0e7ef; }
+    .endpoint {
+      color: #64748b;
+      font-size: 0.95em;
+      font-weight: 400;
+      margin-left: 0.5em;
+    }
+    #status {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #059669;
+      font-weight: 600;
+    }
+    @media (max-width: 700px) {
+      .container { padding: 1rem; }
+      th, td { font-size: 0.95rem; }
+      h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Data Connect Backend</h1>
+    <div class="subtitle">Live API & Database Status Dashboard</div>
+    <div id="status">Loading...</div>
+    <section>
+      <h2>Products <span class="endpoint">/api/all/products</span></h2>
+      <div id="products"></div>
+    </section>
+    <section>
+      <h2>Cashiers <span class="endpoint">/api/all/cashiers</span></h2>
+      <div id="cashiers"></div>
+    </section>
+    <section>
+      <h2>Shifts <span class="endpoint">/api/all/shifts</span></h2>
+      <div id="shifts"></div>
+    </section>
+    <section>
+      <h2>Sales <span class="endpoint">/api/all/sales</span></h2>
+      <div id="sales"></div>
+    </section>
+    <section>
+      <h2>Payments <span class="endpoint">/api/all/payments</span></h2>
+      <div id="payments"></div>
+    </section>
+  </div>
+  <script type="module">
+    async function fetchAndRender(endpoint, containerId, columns) {
+      const container = document.getElementById(containerId);
+      try {
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          container.innerHTML = '<em>No data</em>';
+          return;
+        }
+        let html = '<table><tr>';
+        columns = columns || Object.keys(data[0]);
+        for (const col of columns) html += `<th>${col}</th>`;
+        html += '</tr>';
+        for (const row of data) {
+          html += '<tr>';
+          for (const col of columns) html += `<td>${row[col] ?? ''}</td>`;
+          html += '</tr>';
+        }
+        html += '</table>';
+        container.innerHTML = html;
+      } catch (e) {
+        container.innerHTML = '<span style="color:red">Error loading data</span>';
+      }
+    }
+    function pollAll() {
+      fetchAndRender('/api/all/products', 'products');
+      fetchAndRender('/api/all/cashiers', 'cashiers');
+      fetchAndRender('/api/all/shifts', 'shifts');
+      fetchAndRender('/api/all/sales', 'sales');
+      fetchAndRender('/api/all/payments', 'payments');
+      document.getElementById('status').textContent = 'All endpoints running.';
+    }
+    pollAll();
+    setInterval(pollAll, 3000); // Poll every 3 seconds for realtime updates
+  </script>
+</body>
+</html>
