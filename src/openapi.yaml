@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  title: Data Connect POS API
+  version: 1.0.0
+  description: |
+    API documentation for the Data Connect POS backend. Includes endpoints for products, sales, cashiers, shifts, payments, and authentication.
+servers:
+  - url: http://localhost:5000
+paths:
+  /api/products:
+    get:
+      summary: Get all products
+      responses:
+        '200':
+          description: List of products
+    post:
+      summary: Create a new product
+      responses:
+        '200':
+          description: Product created
+  /api/sales:
+    post:
+      summary: Create a sale and decrement stock
+      responses:
+        '200':
+          description: Sale created
+  /api/shifts/open:
+    post:
+      summary: Open a cashier shift
+      responses:
+        '200':
+          description: Shift opened
+  /api/shifts/close:
+    post:
+      summary: Close a cashier shift
+      responses:
+        '200':
+          description: Shift closed
+  /api/payments:
+    post:
+      summary: Record a payment
+      responses:
+        '200':
+          description: Payment recorded
+  /api/auth/login:
+    post:
+      summary: Login (email/password or PIN)
+      responses:
+        '200':
+          description: Authenticated
